@@ -1,0 +1,18 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 62.5%;
+}
+.App {
+  width: 100%;
+  padding: 20px;
+}
+h1 {
+  margin: 30px 0 50px 0;
+  font-size: 3rem;
+  text-align: center;
+  color: #719b10;
+}
