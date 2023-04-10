@@ -1,0 +1,18 @@
+.Search {
+  width: 100%;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+}
+.Search input {
+  width: 400px;
+  padding: 10px;
+  background: transparent;
+  font-size: 1.8rem;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: bold;
+  color: #719b10;
+  border: 1px solid #719b10;
+  border-radius: 5px;
+  outline: #719b10;
+}
