@@ -1,32 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useReducer, useMemo, useRef, useCallback } from 'react';
+import { useCharacters } from '../hooks/useCharacters';
+import { Search } from './Search';
 import '../styles/Characters.css'
 
-export function Characters() {
-  const [characters, setCharacters] = useState([])
+const initialState = {
+  favorites: []
+}
 
-  useEffect(() => {
-    //llamamos la api
-    fetch('http://rickandmortyapi.com/api/character/')
-      //convertimos la respuesta o informacion a JSON
-      .then(res => res.json())
-      //pasamos la informacion a setCharacters
-      .then(data => setCharacters(data.results))
-    console.log(characters);
+const API = 'https://rickandmortyapi.com/api/character/'
+
+const favoriteReducer = (state, action) => {
+  switch (action.type) { 
+    case 'ADD_TO_FAVORITE':
+      return {
+        ...state,
+        favorites: [...state.favorites, action.payload]
+      };
+    default:
+      return state;
+  }
+}
+
+export function Characters() {
+  const [favorites, dispatch] = useReducer(favoriteReducer, initialState);
+  const [search, setSearch] = useState('');
+  const searchInput = useRef(null)
+
+  //llamado a nuestro hook
+  const characters = useCharacters(API)
+
+  const handleClick = favorite => {
+    dispatch({ type: 'ADD_TO_FAVORITE', payload: favorite })
+  }
+
+  /* const handleSearch = () => {
+    setSearch(searchInput.current.value)
+  } */
+
+  const handleSearch = useCallback(() => {
+    setSearch(searchInput.current.value)
   }, [])
 
+  // const filteredUsers = characters.filter((user) => {
+  //   return user.name.toLowerCase().includes(search.toLowerCase());
+  // })
+
+  const filteredUsers = useMemo(() =>
+    characters.filter((user) => {
+      return user.name.toLowerCase().includes(search.toLowerCase());
+    }),
+    [characters, search]
+  )
+
   return (
-    <article className='Characters'>
-      {characters.map(character => (
-        <div className='Characters-container'>
-          <img src={character.image} alt="" />
-          <div className='Characters-description'>
-            <h2>{character.name}</h2>
-            <p>{'Gender: ' + character.gender}</p>
-            <p>{'Species: ' + character.species}</p>
-            <p>{'Status: ' + character.status}</p>
+    <div className="Characters">
+
+      <Search
+        search={search}
+        searchInput={searchInput}
+        handleSearch={handleSearch}
+      />
+
+      <h2>Favoritos</h2>
+      <div className='Favorites'>
+        {favorites.favorites.map(favorite => (
+            <img key={favorite.id} src={favorite.image} alt="" />
+        ))}
+      </div>
+
+      <div className='Characters-container'>
+        {filteredUsers.map(character => (
+          <div className='Characters-content' key={character.id}>
+            <img src={character.image} alt="" />
+            <div className='Characters-description'>
+              <h2>{character.name}</h2>
+              <p>{'Gender: ' + character.gender}</p>
+              <p>{'Species: ' + character.species}</p>
+              <p>{'Status: ' + character.status}</p>
+              <button
+                type="button"
+                onClick={() => handleClick(character)}
+              >
+                Favoritos
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
-    </article>
+        ))}
+      </div>
+    </div>
   );
 }
